@@ -327,11 +327,11 @@ Start with **SOCOFing** (easy Kaggle download) + **FVC2002 DB1\_A** for benchmar
 
 ### ✅ PHASE 7 — Frontend / Demo UI
 
-- [ ] Build Streamlit demo app:
+- [x] Build Streamlit demo app:
   - Upload two images → run verification → show result + score
-  - Show preprocessed image and detected minutiae
-- [ ] OR build a React.js frontend with webcam capture (optional)
-- [ ] Add visualisation of the matching process (overlay matched minutiae)
+  - Show preprocessed image and detected minutiae *(Using Deep Embedding pipeline instead)*
+- [x] Use `st.tabs` layout for distinct Enroll and Verify workflows
+- [x] Add decoupled launching script (`start.bat`)
 
 ---
 
