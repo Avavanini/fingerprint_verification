@@ -1,0 +1,62 @@
+# ============================================
+# Fingerprint Verification System — .gitignore
+# ============================================
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+
+# --- Virtual Environment ---
+env/
+venv/
+.venv/
+ENV/
+
+# --- IDE ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Data (large files — download separately) ---
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+data/templates/*
+!data/templates/.gitkeep
+
+# --- Models (large binary files) ---
+models/*.pth
+models/*.pt
+models/*.h5
+models/*.onnx
+
+# --- Results ---
+results/*.csv
+
+# --- Jupyter Notebooks checkpoints ---
+.ipynb_checkpoints/
+
+# --- Database ---
+*.db
+*.sqlite3
+
+# --- MLflow ---
+mlruns/
+
+# --- Misc ---
+*.log
+.env

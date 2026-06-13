@@ -1,0 +1,82 @@
+# ============================================
+# Fingerprint Verification System — Configuration
+# ============================================
+
+# --- Paths ---
+paths:
+  data_raw: "data/raw/"
+  data_processed: "data/processed/"
+  templates: "data/templates/"
+  models: "models/"
+  results: "results/"
+  notebooks: "notebooks/"
+
+# --- Image Preprocessing ---
+preprocessing:
+  target_size: [300, 300]            # Resize all images to this resolution
+  normalize: true                     # Zero-mean, unit-variance normalization
+  segmentation:
+    block_size: 16                    # Block size for variance-based segmentation
+    variance_threshold: 100           # Minimum variance to classify as foreground
+  enhancement:
+    method: "gabor"                   # Options: "gabor", "fingerprint-enhancer"
+    gabor:
+      ksize: 31                       # Kernel size
+      sigma: 4.0                      # Standard deviation of Gaussian envelope
+      lambd: 10.0                     # Wavelength of sinusoidal factor
+      gamma: 0.5                      # Spatial aspect ratio
+      num_orientations: 8             # Number of filter orientations
+  binarization:
+    method: "otsu"                    # Options: "otsu", "adaptive"
+    adaptive_block_size: 15           # Block size for adaptive thresholding
+    adaptive_c: 5                     # Constant subtracted from mean
+  thinning:
+    method: "skeletonize"             # Options: "skeletonize", "zhang-suen"
+
+# --- Quality Assessment ---
+quality:
+  nfiq_threshold: 3                   # Reject images with NFIQ score > this
+  min_minutiae_count: 12              # Minimum minutiae for valid fingerprint
+
+# --- Feature Extraction ---
+feature_extraction:
+  minutiae:
+    border_margin: 10                 # Ignore minutiae within N pixels of border
+    min_distance: 10                  # Minimum distance between valid minutiae
+  embedding:
+    model: "siamese_resnet18"         # Options: "siamese_resnet18", "siamese_custom"
+    embedding_dim: 128                # Dimensionality of embedding vector
+    model_path: "models/siamese_model.pth"
+
+# --- Matching ---
+matching:
+  method: "minutiae"                  # Options: "minutiae", "embedding", "hybrid"
+  minutiae:
+    spatial_tolerance: 15             # Max pixel distance for minutia pairing (px)
+    angular_tolerance: 15             # Max angle difference for minutia pairing (degrees)
+    alignment_method: "hough"         # Options: "hough", "iterative"
+  embedding:
+    similarity_metric: "cosine"       # Options: "cosine", "euclidean"
+
+# --- Decision ---
+decision:
+  threshold: 0.40                     # Default matching threshold
+  eer_threshold: null                 # Will be set after evaluation (EER point)
+
+# --- API ---
+api:
+  host: "0.0.0.0"
+  port: 8000
+  debug: false
+  database_url: "sqlite:///./fingerprint.db"
+
+# --- Training (Siamese Network) ---
+training:
+  epochs: 50
+  batch_size: 32
+  learning_rate: 0.0001
+  loss: "contrastive"                 # Options: "contrastive", "triplet"
+  margin: 1.0
+  train_split: 0.7
+  val_split: 0.15
+  test_split: 0.15
