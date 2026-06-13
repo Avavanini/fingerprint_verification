@@ -251,14 +251,14 @@ Start with **SOCOFing** (easy Kaggle download) + **FVC2002 DB1\_A** for benchmar
 - [x] Save templates to `/data/templates/`
 
 #### 3.3 Deep Learning Embedding (Optional — Phase 3B)
-- [ ] Collect genuine pairs (same finger, different impressions) and impostor pairs
-- [ ] Design a **Siamese CNN** architecture:
+- [x] Collect genuine pairs (same finger, different impressions) and impostor pairs *(Using SOCOFing Real vs Altered)*
+- [x] Design a **Siamese CNN** architecture:
   - Shared CNN backbone (ResNet-18 or custom)
   - Embedding layer (128-D vector)
   - Contrastive loss or triplet loss
-- [ ] Train on FVC2002 pairs
-- [ ] Save model weights to `/models/siamese_model.pth`
-- [ ] Extract and store 128-D embeddings for all enrolled templates
+- [x] Train on FVC2002 pairs *(Trained on SOCOFing pairs)*
+- [x] Save model weights to `/models/siamese_model.pth`
+- [x] Extract and store 128-D embeddings for all enrolled templates
 
 ---
 
