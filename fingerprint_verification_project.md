@@ -282,10 +282,10 @@ Start with **SOCOFing** (easy Kaggle download) + **FVC2002 DB1\_A** for benchmar
 - [ ] Add FAISS index for fast 1:N search (future extension)
 
 #### 4.3 Decision Module
-- [ ] Implement threshold-based decision: score ≥ T → **MATCH**
-- [ ] Run threshold sweep on validation set
-- [ ] Plot FAR vs FRR vs threshold
-- [ ] Select operating threshold at EER
+- [x] Implement threshold-based decision: score ≥ T → **MATCH**
+- [x] Run threshold sweep on validation set
+- [x] Plot FAR vs FRR vs threshold
+- [x] Select operating threshold at EER
 
 ---
 
