@@ -1,7 +1,20 @@
 """
-schemas.py — Pydantic schemas for API request/response validation.
-
-Stub module — implementation in Phase 6.
+schemas.py — Pydantic models for API request and response validation.
 """
 
-# TODO: Define Pydantic schemas (Phase 6)
+from pydantic import BaseModel
+
+class EnrollResponse(BaseModel):
+    user_id: str
+    status: str
+    message: str
+
+class VerifyResponse(BaseModel):
+    user_id: str
+    match: bool
+    score: float
+    threshold: float
+    message: str
+
+class ErrorResponse(BaseModel):
+    detail: str

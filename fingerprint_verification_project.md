@@ -304,24 +304,24 @@ Start with **SOCOFing** (easy Kaggle download) + **FVC2002 DB1\_A** for benchmar
 ### ✅ PHASE 6 — API Development
 
 #### 6.1 Enroll Endpoint
-- [ ] `POST /enroll` — accepts image + user\_id, stores template
-- [ ] Validate image quality before enrolling
-- [ ] Return: `{ "user_id": ..., "status": "enrolled" }`
+- [x] `POST /enroll` — accepts image + user\_id, stores template
+- [x] Validate image quality before enrolling (Basic validation integrated)
+- [x] Return: `{ "user_id": ..., "status": "enrolled" }`
 
 #### 6.2 Verify Endpoint
-- [ ] `POST /verify` — accepts probe image + claimed user\_id
-- [ ] Load stored template, run matching
-- [ ] Return: `{ "match": true/false, "score": 0.87, "threshold": 0.75 }`
+- [x] `POST /verify` — accepts probe image + claimed user\_id
+- [x] Load stored template, run matching
+- [x] Return: `{ "match": true/false, "score": 0.87, "threshold": 0.75 }`
 
 #### 6.3 Database Integration
-- [ ] Define `User` and `Template` models (SQLAlchemy)
-- [ ] Set up SQLite for dev, PostgreSQL for production
-- [ ] Write CRUD operations for templates
+- [x] Define `User` and `Template` models (SQLAlchemy)
+- [x] Set up SQLite for dev, PostgreSQL for production
+- [x] Write CRUD operations for templates
 
 #### 6.4 API Testing
-- [ ] Write `pytest` tests for all endpoints
-- [ ] Test edge cases: empty image, unknown user, low-quality image
-- [ ] Generate OpenAPI docs (FastAPI auto-generates via `/docs`)
+- [x] Write `pytest` tests for all endpoints
+- [x] Test edge cases: empty image, unknown user, low-quality image
+- [x] Generate OpenAPI docs (FastAPI auto-generates via `/docs`)
 
 ---
 
