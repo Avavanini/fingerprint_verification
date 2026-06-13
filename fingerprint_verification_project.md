@@ -157,10 +157,10 @@ Start with **SOCOFing** (easy Kaggle download) + **FVC2002 DB1\_A** for benchmar
 
 ### ✅ PHASE 0 — Project Setup
 
-- [ ] Create project repository on GitHub
-- [ ] Set up virtual environment (`python -m venv env`)
-- [ ] Create `requirements.txt` with all dependencies
-- [ ] Set up project folder structure:
+- [x] Create project repository on GitHub
+- [x] Set up virtual environment (`python -m venv env`)
+- [x] Create `requirements.txt` with all dependencies
+- [x] Set up project folder structure:
   ```
   fingerprint-verification/
   ├── data/
@@ -178,27 +178,27 @@ Start with **SOCOFing** (easy Kaggle download) + **FVC2002 DB1\_A** for benchmar
   ├── configs/
   └── README.md
   ```
-- [ ] Set up `config.yaml` for paths, thresholds, and hyperparameters
-- [ ] Initialize `MLflow` or `WandB` for experiment tracking (optional)
-- [ ] Write a basic `README.md`
+- [x] Set up `config.yaml` for paths, thresholds, and hyperparameters
+- [x] Initialize `MLflow` or `WandB` for experiment tracking (optional)
+- [x] Write a basic `README.md`
 
 ---
 
 ### ✅ PHASE 1 — Data Acquisition & EDA
 
 #### 1.1 Dataset Download & Organisation
-- [ ] Download SOCOFing dataset from Kaggle
-- [ ] Download FVC2002 DB1\_A (benchmark dataset)
-- [ ] Organise images into `/data/raw/` by subject ID
-- [ ] Create a `dataset_info.csv` (image path, subject ID, finger index, impression number)
+- [x] Download SOCOFing dataset from Kaggle
+- [x] ~~Download FVC2002 DB1\_A (benchmark dataset)~~ *(deferred — requires institutional registration; SOCOFing is sufficient as primary dataset)*
+- [x] Organise images into `/data/raw/` by subject ID
+- [x] Create a `dataset_info.csv` (image path, subject ID, finger index, impression number)
 
 #### 1.2 Exploratory Data Analysis
-- [ ] Count total images, subjects, impressions per finger
-- [ ] Visualise sample images for each finger class
-- [ ] Check image resolution, bit depth, and format consistency
-- [ ] Plot histogram of pixel intensities
-- [ ] Identify and document corrupted/low-quality images
-- [ ] Create EDA notebook: `notebooks/01_eda.ipynb`
+- [x] Count total images, subjects, impressions per finger
+- [x] Visualise sample images for each finger class
+- [x] Check image resolution, bit depth, and format consistency
+- [x] Plot histogram of pixel intensities
+- [x] Identify and document corrupted/low-quality images
+- [x] Create EDA notebook: `notebooks/01_eda.ipynb`
 
 ---
 
