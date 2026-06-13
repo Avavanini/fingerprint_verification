@@ -237,18 +237,18 @@ Start with **SOCOFing** (easy Kaggle download) + **FVC2002 DB1\_A** for benchmar
 ### ✅ PHASE 3 — Feature Extraction
 
 #### 3.1 Minutiae Detection (Classical)
-- [ ] Implement **Crossing Number (CN)** algorithm on thinned image
+- [x] Implement **Crossing Number (CN)** algorithm on thinned image
   - CN = 1 → Ridge ending
   - CN = 3 → Ridge bifurcation
-- [ ] Extract minutiae list: `[(x, y, type, orientation), ...]`
-- [ ] Filter spurious minutiae near borders
-- [ ] Visualise detected minutiae overlaid on original image
+- [x] Extract minutiae list: `[(x, y, type, orientation), ...]`
+- [x] Filter spurious minutiae near borders
+- [x] Visualise detected minutiae overlaid on original image
 
 #### 3.2 Minutiae Descriptor
-- [ ] Compute local ridge orientation for each minutia
-- [ ] Optionally compute FingerCode descriptor (Gabor-based texture cylinder)
-- [ ] Serialise feature templates to JSON/NumPy format
-- [ ] Save templates to `/data/templates/`
+- [x] Compute local ridge orientation for each minutia
+- [x] Optionally compute FingerCode descriptor (Gabor-based texture cylinder) *(Implemented sector-based ridge density descriptor)*
+- [x] Serialise feature templates to JSON/NumPy format
+- [x] Save templates to `/data/templates/`
 
 #### 3.3 Deep Learning Embedding (Optional — Phase 3B)
 - [ ] Collect genuine pairs (same finger, different impressions) and impostor pairs
