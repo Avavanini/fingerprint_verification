@@ -265,17 +265,20 @@ Start with **SOCOFing** (easy Kaggle download) + **FVC2002 DB1\_A** for benchmar
 ### ✅ PHASE 4 — Matching Engine
 
 #### 4.1 Classical Minutiae Matching
-- [ ] Implement **alignment step:**
-  - Select reference minutia pair
-  - Compute rotation and translation
-  - Apply Hough transform for global alignment
-- [ ] Implement **minutia pairing:**
+- [x] Implement **alignment step:**
+  - Select reference minutia pair using best Ridge Density Descriptor match
+  - Compute rotation and translation for simplified heuristic alignment
+- [x] Implement **minutia pairing:**
   - For each probe minutia, find nearest gallery minutia within tolerance (Δx, Δy, Δθ)
-- [ ] Compute **matching score** = matched pairs / min(probe count, gallery count)
-- [ ] Tune spatial tolerance and angular tolerance on FVC2002
+- [x] Compute **matching score** = matched pairs / min(probe count, gallery count)
+- [x] Tune spatial tolerance and angular tolerance on SOCOFing
 
-#### 4.2 Deep Embedding Matching (Optional)
-- [ ] Implement `compute_similarity(emb1, emb2)` → cosine similarity
+#### 4.1.B Future Enhancements (Classical Matching)
+- [ ] Implement strict generalized **Hough Transform** for global alignment
+- [ ] Validate and tune thresholds on the **FVC2002** dataset
+
+#### 4.2 Deep Embedding Matching
+- [x] Implement `compute_similarity(emb1, emb2)` → cosine similarity
 - [ ] Add FAISS index for fast 1:N search (future extension)
 
 #### 4.3 Decision Module
