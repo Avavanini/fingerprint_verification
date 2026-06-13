@@ -291,13 +291,13 @@ Start with **SOCOFing** (easy Kaggle download) + **FVC2002 DB1\_A** for benchmar
 
 ### ✅ PHASE 5 — Evaluation & Benchmarking
 
-- [ ] Create genuine pairs and impostor pairs from dataset
-- [ ] Run matcher on all pairs, collect scores
-- [ ] Compute **FAR, FRR, EER**
-- [ ] Plot **ROC curve** and compute **AUC**
-- [ ] Compare against FVC2002 published baselines
-- [ ] Log results to `results/evaluation_report.csv`
-- [ ] Create notebook: `notebooks/04_evaluation.ipynb`
+- [x] Create genuine pairs and impostor pairs from dataset
+- [x] Run matcher on all pairs, collect scores
+- [x] Compute **FAR, FRR, EER**
+- [x] Plot **ROC curve** and compute **AUC**
+- [ ] Compare against FVC2002 published baselines *(Skipped: Validated on SOCOFing Instead)*
+- [x] Log results to `results/evaluation_report.csv`
+- [x] Create notebook: `notebooks/07_evaluation.ipynb`
 
 ---
 
