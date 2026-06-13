@@ -10,7 +10,7 @@ Pillow>=10.0.0
 scipy>=1.11.0
 
 # --- Fingerprint-Specific ---
-fingerprint-enhancer>=0.2.0
+fingerprint-enhancer>=0.0.14
 
 # --- Machine / Deep Learning ---
 torch>=2.0.0
