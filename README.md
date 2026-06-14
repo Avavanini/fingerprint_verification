@@ -66,36 +66,51 @@ fingerprint-verification/
 
 ---
 
+## 📸 Demo
+![Demo Screenshot](demo_screenshot.png) *(Placeholder: Add your Streamlit UI screenshot here!)*
+
+---
+
 ## 🚀 Quick Start
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/<your-username>/fingerprint-verification.git
-cd fingerprint-verification
+git clone https://github.com/Avavanini/fingerprint_verification.git
+cd fingerprint_verification
 ```
 
-### 2. Set Up Virtual Environment
+### 2. Set Up Virtual Environment & Dependencies
 ```bash
-python -m venv env
-# Windows
-env\Scripts\activate
-# macOS/Linux
-source env/bin/activate
-```
-
-### 3. Install Dependencies
-```bash
+# We recommend using Conda
+conda create -n fingerprint_env python=3.10
+conda activate fingerprint_env
 pip install -r requirements.txt
+pip install streamlit
 ```
 
-### 4. Configure
-Edit `configs/config.yaml` to set paths and parameters for your environment.
+### 3. Migrate the Database (Required for Hybrid Matching)
+```bash
+python scripts/migrate_db.py
+```
 
-### 5. Run the API
+### 4. Run the API Backend
+Open a terminal and start the FastAPI server:
 ```bash
 uvicorn src.api.main:app --reload
 ```
 Open **http://localhost:8000/docs** for interactive API documentation.
+
+### 5. Run the Streamlit Frontend UI
+Leave the backend running, open a **new** terminal, activate your environment, and run:
+```bash
+streamlit run src/ui/app.py
+```
+
+### 6. Run Evaluation Benchmarks
+Test the system's accuracy across different algorithms and difficulties:
+```bash
+python scripts/evaluate.py --mode hybrid --difficulty All
+```
 
 ---
 
