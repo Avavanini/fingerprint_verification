@@ -99,3 +99,94 @@ class TestScoring:
         
         emb4 = np.array([0.0, 1.0])
         assert compute_embedding_score(emb1, emb4) == pytest.approx(0.5) # Cosine is 0.0, mapped to 0.5
+
+
+# ===== Hybrid Scoring Tests =====
+
+from src.matching.hybrid import compute_hybrid_score
+
+class TestHybridScoring:
+    def test_hybrid_score_with_both_components(self):
+        """Verify the weighted fusion formula: hybrid = α*emb + (1-α)*min."""
+        emb1 = np.array([1.0, 0.0])
+        emb2 = np.array([1.0, 0.0])
+        
+        # Create minimal templates that will produce a known minutiae score
+        # Two identical templates → perfect alignment → all pairs match
+        template1 = {
+            'minutiae': [
+                {'x': 100, 'y': 100, 'type': 'ending', 'orientation': 0.1, 'descriptor': [0.5, 0.5]},
+                {'x': 200, 'y': 200, 'type': 'bifurcation', 'orientation': 0.5, 'descriptor': [0.3, 0.7]}
+            ]
+        }
+        template2 = {
+            'minutiae': [
+                {'x': 100, 'y': 100, 'type': 'ending', 'orientation': 0.1, 'descriptor': [0.5, 0.5]},
+                {'x': 200, 'y': 200, 'type': 'bifurcation', 'orientation': 0.5, 'descriptor': [0.3, 0.7]}
+            ]
+        }
+        
+        alpha = 0.6
+        hybrid, emb_s, min_s = compute_hybrid_score(emb1, emb2, template1, template2, alpha=alpha)
+        
+        # Embedding score should be 1.0 (identical vectors)
+        assert emb_s == pytest.approx(1.0)
+        
+        # Minutiae score should be > 0 (identical templates)
+        assert min_s > 0.0
+        
+        # Hybrid should follow the formula
+        expected = alpha * emb_s + (1 - alpha) * min_s
+        assert hybrid == pytest.approx(expected)
+
+    def test_hybrid_score_fallback_no_templates(self):
+        """When minutiae templates are None, hybrid falls back to embedding-only."""
+        emb1 = np.array([1.0, 0.0])
+        emb2 = np.array([0.0, 1.0])
+        
+        hybrid, emb_s, min_s = compute_hybrid_score(emb1, emb2, None, None, alpha=0.6)
+        
+        # Should fall back to embedding-only
+        assert min_s == 0.0
+        assert hybrid == pytest.approx(emb_s)
+        assert emb_s == pytest.approx(0.5)  # Cosine 0.0 → mapped to 0.5
+
+    def test_hybrid_score_fallback_one_template_missing(self):
+        """When only one template is None, hybrid falls back to embedding-only."""
+        emb1 = np.array([1.0, 0.0])
+        emb2 = np.array([1.0, 0.0])
+        
+        template = {
+            'minutiae': [
+                {'x': 100, 'y': 100, 'type': 'ending', 'orientation': 0.1, 'descriptor': [0.5]}
+            ]
+        }
+        
+        hybrid, emb_s, min_s = compute_hybrid_score(emb1, emb2, template, None, alpha=0.6)
+        
+        assert min_s == 0.0
+        assert hybrid == pytest.approx(emb_s)
+
+    def test_hybrid_alpha_extremes(self):
+        """Alpha=1.0 should be pure embedding, alpha=0.0 should be pure minutiae."""
+        emb1 = np.array([1.0, 0.0])
+        emb2 = np.array([1.0, 0.0])
+        
+        template1 = {
+            'minutiae': [
+                {'x': 100, 'y': 100, 'type': 'ending', 'orientation': 0.1, 'descriptor': [0.5, 0.5]},
+            ]
+        }
+        template2 = {
+            'minutiae': [
+                {'x': 100, 'y': 100, 'type': 'ending', 'orientation': 0.1, 'descriptor': [0.5, 0.5]},
+            ]
+        }
+        
+        # Alpha = 1.0 → pure embedding
+        hybrid_1, emb_s, min_s = compute_hybrid_score(emb1, emb2, template1, template2, alpha=1.0)
+        assert hybrid_1 == pytest.approx(emb_s)
+        
+        # Alpha = 0.0 → pure minutiae
+        hybrid_0, emb_s, min_s = compute_hybrid_score(emb1, emb2, template1, template2, alpha=0.0)
+        assert hybrid_0 == pytest.approx(min_s)

@@ -1,5 +1,8 @@
 """
 routes.py — API endpoints for enrollment and verification.
+
+Uses hybrid matching that fuses deep CNN embeddings with classical
+minutiae matching for robust verification across all difficulty levels.
 """
 
 import cv2
@@ -8,7 +11,7 @@ import numpy as np
 from fastapi import APIRouter, Depends, UploadFile, File, Form, Request, HTTPException, status
 from sqlalchemy.orm import Session
 from pydantic import ValidationError
-from typing import List
+from typing import List, Tuple, Optional
 
 from .database import get_db
 from .models import UserTemplate
@@ -17,14 +20,20 @@ from .auth import verify_api_key
 
 from src.matching.scorer import compute_embedding_score
 from src.matching.decision import make_decision
+from src.matching.hybrid import compute_hybrid_score, extract_minutiae_template
 
 router = APIRouter(dependencies=[Depends(verify_api_key)])
 
-# From Phase 5 evaluation, our optimal threshold is 0.9548
-OPERATING_THRESHOLD = 0.9548
+# Hybrid evaluation optimal threshold (tuned across All difficulties)
+OPERATING_THRESHOLD = 0.9447
 
-def process_image(request: Request, file_bytes: bytes) -> np.ndarray:
-    """Helper to process image bytes into a 128-D embedding."""
+def process_image(request: Request, file_bytes: bytes) -> Tuple[np.ndarray, Optional[dict]]:
+    """
+    Helper to process image bytes into a 128-D embedding and a minutiae template.
+    
+    Returns:
+        Tuple of (embedding_array, minutiae_template_dict_or_None).
+    """
     # Convert bytes to numpy array
     nparr = np.frombuffer(file_bytes, np.uint8)
     img_cv = cv2.imdecode(nparr, cv2.IMREAD_GRAYSCALE)
@@ -38,13 +47,17 @@ def process_image(request: Request, file_bytes: bytes) -> np.ndarray:
     transform = request.app.state.transform
     tensor = transform(img_rgb)
     
-    # Extract embedding
+    # Extract deep embedding
     model = request.app.state.model
     device = request.app.state.device
     
     # model is in eval mode from main.py
     emb = request.app.state.extract_embedding(model, tensor, device).cpu().numpy()[0]
-    return emb
+    
+    # Extract minutiae template (classical pipeline)
+    minutiae_template = extract_minutiae_template(img_cv)
+    
+    return emb, minutiae_template
 
 
 @router.post("/enroll", response_model=EnrollResponse, responses={400: {"model": ErrorResponse}})
@@ -55,7 +68,8 @@ async def enroll(
     db: Session = Depends(get_db)
 ):
     """
-    Enroll a new user by processing their fingerprint image and storing the deep embedding.
+    Enroll a new user by processing their fingerprint image and storing
+    both the deep embedding and the minutiae template for hybrid matching.
     """
     if not user_id:
         raise HTTPException(status_code=400, detail="user_id cannot be empty")
@@ -68,7 +82,7 @@ async def enroll(
     file_bytes = await file.read()
     
     try:
-        emb = process_image(request, file_bytes)
+        emb, minutiae_template = process_image(request, file_bytes)
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Error processing image: {str(e)}")
         
@@ -76,7 +90,14 @@ async def enroll(
     emb_list = emb.tolist()
     emb_str = json.dumps(emb_list)
     
-    new_template = UserTemplate(user_id=user_id, embedding_str=emb_str)
+    # Serialize minutiae template (may be None if extraction failed)
+    minutiae_str = json.dumps(minutiae_template) if minutiae_template is not None else None
+    
+    new_template = UserTemplate(
+        user_id=user_id,
+        embedding_str=emb_str,
+        minutiae_template_str=minutiae_str
+    )
     db.add(new_template)
     db.commit()
     
@@ -95,7 +116,8 @@ async def verify(
     db: Session = Depends(get_db)
 ):
     """
-    Verify a fingerprint against a specific enrolled user's template.
+    Verify a fingerprint against a specific enrolled user's template
+    using hybrid matching (deep embedding + classical minutiae fusion).
     """
     if not user_id:
         raise HTTPException(status_code=400, detail="user_id cannot be empty")
@@ -105,10 +127,10 @@ async def verify(
     if not user:
         raise HTTPException(status_code=404, detail=f"User {user_id} not found. Please enroll first.")
         
-    # Process probe image
+    # Process probe image (get both embedding and minutiae)
     file_bytes = await file.read()
     try:
-        probe_emb = process_image(request, file_bytes)
+        probe_emb, probe_template = process_image(request, file_bytes)
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Error processing image: {str(e)}")
         
@@ -116,14 +138,25 @@ async def verify(
     gallery_emb_list = json.loads(user.embedding_str)
     gallery_emb = np.array(gallery_emb_list, dtype=np.float32)
     
-    # Score
-    score = compute_embedding_score(probe_emb, gallery_emb)
-    is_match = make_decision(score, OPERATING_THRESHOLD)
+    # Reconstruct gallery minutiae template (may be None for old enrollments)
+    gallery_template = None
+    if user.minutiae_template_str is not None:
+        gallery_template = json.loads(user.minutiae_template_str)
+    
+    # Compute hybrid score
+    hybrid_score, emb_score, min_score = compute_hybrid_score(
+        probe_emb, gallery_emb,
+        probe_template, gallery_template
+    )
+    
+    is_match = make_decision(hybrid_score, OPERATING_THRESHOLD)
     
     return VerifyResponse(
         user_id=user_id,
         match=is_match,
-        score=score,
+        score=hybrid_score,
         threshold=OPERATING_THRESHOLD,
+        embedding_score=emb_score,
+        minutiae_score=min_score,
         message="Match successful." if is_match else "Match failed."
     )

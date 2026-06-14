@@ -132,9 +132,9 @@ Start with **SOCOFing** (easy Kaggle download) + **FVC2002 DB1\_A** for benchmar
 | **Correlation-based** | Directly compare pixel intensities | Low — sensitive to distortion |
 | **FingerCode** | Gabor-filtered texture codes | Medium |
 | **Deep Learning (Siamese)** | Learned embeddings, end-to-end | High — best accuracy |
-| **Hybrid** | Minutiae + texture or minutiae + DL | High |
+| **Hybrid** | Minutiae + DL embedding fusion | High — best robustness |
 
-**Recommended:** Start with minutiae-based, then optionally add a Siamese network for improved accuracy.
+**Recommended:** Start with minutiae-based, then add a Siamese network, and finally fuse both with weighted hybrid matching for best robustness across distortion levels.
 
 ---
 
@@ -287,6 +287,17 @@ Start with **SOCOFing** (easy Kaggle download) + **FVC2002 DB1\_A** for benchmar
 - [x] Plot FAR vs FRR vs threshold
 - [x] Select operating threshold at EER
 
+#### 4.4 Hybrid Matching (Fusion)
+- [x] Implement **weighted linear fusion** of deep embedding and minutiae scores:
+  - `hybrid_score = α × embedding_score + (1 - α) × minutiae_score`
+  - Default α = 0.6 (60% CNN + 40% minutiae), configurable per use case
+- [x] Create `src/matching/hybrid.py` with:
+  - `extract_minutiae_template()` — full classical pipeline (preprocess → skeleton → CN detection → descriptors)
+  - `compute_classical_minutiae_score()` — alignment + pairing + scoring
+  - `compute_hybrid_score()` — fuses both signals with graceful fallback
+- [x] Graceful fallback: if minutiae extraction fails (low quality), fall back to embedding-only
+- [x] Add unit tests for hybrid scoring, fallback, and alpha extremes *(9/9 passed)*
+
 ---
 
 ### ✅ PHASE 5 — Evaluation & Benchmarking
@@ -298,6 +309,10 @@ Start with **SOCOFing** (easy Kaggle download) + **FVC2002 DB1\_A** for benchmar
 - [ ] Compare against FVC2002 published baselines *(Skipped: Validated on SOCOFing Instead)*
 - [x] Log results to `results/evaluation_report.csv`
 - [x] Create notebook: `notebooks/07_evaluation.ipynb`
+- [x] Support multi-difficulty evaluation (`--difficulty Easy|Medium|Hard|All`)
+- [x] Support multi-mode evaluation (`--mode embedding|minutiae|hybrid`)
+- [x] Support configurable fusion weight (`--alpha 0.6`)
+- [x] Evaluate all three alteration types: Central Rotation, Obliteration, Z-Cut
 
 ---
 
@@ -310,8 +325,8 @@ Start with **SOCOFing** (easy Kaggle download) + **FVC2002 DB1\_A** for benchmar
 
 #### 6.2 Verify Endpoint
 - [x] `POST /verify` — accepts probe image + claimed user\_id
-- [x] Load stored template, run matching
-- [x] Return: `{ "match": true/false, "score": 0.87, "threshold": 0.75 }`
+- [x] Load stored template, run **hybrid matching** (deep embedding + minutiae fusion)
+- [x] Return: `{ "match": true/false, "score": 0.87, "threshold": 0.94, "embedding_score": 0.95, "minutiae_score": 0.72 }`
 
 #### 6.3 Database Integration
 - [x] Define `User` and `Template` models (SQLAlchemy)
@@ -380,7 +395,9 @@ fingerprint-verification/
 │   ├── matching/
 │   │   ├── align.py
 │   │   ├── matcher.py
-│   │   └── scorer.py
+│   │   ├── scorer.py
+│   │   ├── decision.py
+│   │   └── hybrid.py          # Hybrid fusion (CNN + minutiae)
 │   └── api/
 │       ├── main.py             # FastAPI app
 │       ├── models.py           # DB models
